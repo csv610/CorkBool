@@ -24,21 +24,12 @@
 // |    along with Cork.  If not, see <http://www.gnu.org/licenses/>.
 // +-------------------------------------------------------------------------
 
-// This file contains a command line program that can be used
-// to exercise Cork's functionality without having to write
-// any code.
-
 #include "files.h"
 
 #include <iostream>
-using std::cout;
-using std::cerr;
-using std::endl;
 #include <sstream>
-using std::stringstream;
-using std::string;
-
-using std::ostream;
+#include <memory>
+using namespace std;
 
 #include "cork.h"
 
@@ -311,12 +302,3 @@ int main(int argc, char *argv[])
     
     return 0;
 }
-
-
-
-
-
-
-
-
-

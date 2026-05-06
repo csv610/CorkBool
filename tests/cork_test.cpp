@@ -2,6 +2,8 @@
 #include <cassert>
 #include <iostream>
 #include <cstdlib>
+#include <vector>
+#include <memory>
 #include "cork.h"
 #include "files.h"
 
@@ -34,8 +36,8 @@ CorkTriMesh create_mesh(uint n_vertices, uint n_triangles) {
     CorkTriMesh mesh;
     mesh.n_vertices = 0;
     mesh.n_triangles = 0;
-    mesh.vertices = new float[n_vertices * 3];
-    mesh.triangles = new uint[n_triangles * 3];
+    mesh.vertices = std::make_unique<float[]>(n_vertices * 3).release();
+    mesh.triangles = std::make_unique<uint[]>(n_triangles * 3).release();
     return mesh;
 }
 
@@ -122,8 +124,8 @@ void test_sample_files() {
     CorkTriMesh in0, in1;
     in0.n_vertices = meshA.vertices.size();
     in0.n_triangles = meshA.triangles.size();
-    in0.triangles = new uint[in0.n_triangles * 3];
-    in0.vertices = new float[in0.n_vertices * 3];
+    in0.triangles = std::make_unique<uint[]>(in0.n_triangles * 3).release();
+    in0.vertices = std::make_unique<float[]>(in0.n_vertices * 3).release();
     
     for (uint i = 0; i < in0.n_triangles; i++) {
         in0.triangles[3*i+0] = meshA.triangles[i].a;
@@ -138,8 +140,8 @@ void test_sample_files() {
     
     in1.n_vertices = meshB.vertices.size();
     in1.n_triangles = meshB.triangles.size();
-    in1.triangles = new uint[in1.n_triangles * 3];
-    in1.vertices = new float[in1.n_vertices * 3];
+    in1.triangles = std::make_unique<uint[]>(in1.n_triangles * 3).release();
+    in1.vertices = std::make_unique<float[]>(in1.n_vertices * 3).release();
     
     for (uint i = 0; i < in1.n_triangles; i++) {
         in1.triangles[3*i+0] = meshB.triangles[i].a;
