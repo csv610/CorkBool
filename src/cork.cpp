@@ -8,17 +8,17 @@
 // |    See the included COPYRIGHT file for further details.
 // |    
 // |    This file is part of the Cork library.
-// |
+//
 // |    Cork is free software: you can redistribute it and/or modify
 // |    it under the terms of the GNU Lesser General Public License as
 // |    published by the Free Software Foundation, either version 3 of
 // |    the License, or (at your option) any later version.
-// |
+//
 // |    Cork is distributed in the hope that it will be useful,
 // |    but WITHOUT ANY WARRANTY; without even the implied warranty of
 // |    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // |    GNU Lesser General Public License for more details.
-// |
+//
 // |    You should have received a copy 
 // |    of the GNU Lesser General Public License
 // |    along with Cork.  If not, see <http://www.gnu.org/licenses/>.
@@ -34,6 +34,38 @@ void freeCorkTriMesh(CorkTriMesh *mesh)
     delete[] mesh->vertices;
     mesh->n_triangles = 0;
     mesh->n_vertices = 0;
+}
+
+CorkTriMeshOwner::CorkTriMeshOwner(uint n_verts, uint n_tris) 
+    : vertices(std::make_unique<float[]>(n_verts * 3))
+    , triangles(std::make_unique<uint[]>(n_tris * 3))
+    , n_vertices(n_verts)
+    , n_triangles(n_tris)
+{}
+
+CorkTriMesh CorkTriMeshOwner::get() {
+    return CorkTriMesh{
+        n_triangles,
+        n_vertices,
+        triangles.get(),
+        vertices.get()
+    };
+}
+
+void CorkTriMeshOwner::load(const CorkTriMesh& mesh) {
+    n_vertices = mesh.n_vertices;
+    n_triangles = mesh.n_triangles;
+    vertices = std::make_unique<float[]>(mesh.n_vertices * 3);
+    triangles = std::make_unique<uint[]>(mesh.n_triangles * 3);
+    std::copy_n(mesh.vertices, mesh.n_vertices * 3, vertices.get());
+    std::copy_n(mesh.triangles, mesh.n_triangles * 3, triangles.get());
+}
+
+void CorkTriMeshOwner::reset() {
+    vertices.reset();
+    triangles.reset();
+    n_vertices = 0;
+    n_triangles = 0;
 }
 
 

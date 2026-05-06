@@ -8,36 +8,48 @@
 // |    See the included COPYRIGHT file for further details.
 // |    
 // |    This file is part of the Cork library.
-// |
+//
 // |    Cork is free software: you can redistribute it and/or modify
 // |    it under the terms of the GNU Lesser General Public License as
 // |    published by the Free Software Foundation, either version 3 of
 // |    the License, or (at your option) any later version.
-// |
+//
 // |    Cork is distributed in the hope that it will be useful,
 // |    but WITHOUT ANY WARRANTY; without even the implied warranty of
 // |    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // |    GNU Lesser General Public License for more details.
-// |
+//
 // |    You should have received a copy 
 // |    of the GNU Lesser General Public License
 // |    along with Cork.  If not, see <http://www.gnu.org/licenses/>.
 // +-------------------------------------------------------------------------
 #pragma once
 
+#include <memory>
+
 #ifndef uint
-typedef unsigned int uint;
+using uint = unsigned int;
 #endif
 
-// if a mesh is taken as input, the client must manage the memory
-// if a mesh is given as output, please use the provided
-// function to free the allocated memory.
 struct CorkTriMesh
 {
     uint    n_triangles;
     uint    n_vertices;
     uint    *triangles;
     float   *vertices;
+};
+
+struct CorkTriMeshOwner {
+    std::unique_ptr<uint[]> triangles;
+    std::unique_ptr<float[]> vertices;
+    uint n_triangles = 0;
+    uint n_vertices = 0;
+
+    CorkTriMeshOwner() = default;
+    explicit CorkTriMeshOwner(uint n_verts, uint n_tris);
+    CorkTriMesh get();
+    void load(const CorkTriMesh& mesh);
+    void reset();
 };
 
 void freeCorkTriMesh(CorkTriMesh *mesh);
