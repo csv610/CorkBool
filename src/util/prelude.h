@@ -30,14 +30,13 @@
 #include <ctime>
 #include <algorithm>
 #include <iostream>
+#include <array>
+#include <vector>
+#include <optional>
+#include <variant>
 
-#ifndef uint
-typedef unsigned int uint;
-#endif
-
-#ifndef byte
-typedef unsigned char byte;
-#endif
+using uint = unsigned int;
+using byte = unsigned char;
 
 // ***********
 // * Logging
@@ -83,30 +82,23 @@ std::ostream &err();
 // ***********
 // * Assorted
 
-// snap the value a into the specified range
-inline double clamp(double a, double mina, double maxa) {
-    return std::min(maxa, std::max(mina, a));
-}
-inline float  clamp(float  a, float  mina, float  maxa) {
-    return std::min(maxa, std::max(mina, a));
+template<typename T>
+constexpr T clamp(T val, T mina, T maxa) {
+    return std::max(mina, std::min(maxa, val));
 }
 
-// modulo the value a into the specified range
-inline double wrap(double a, double mina, double maxa) {
-    double val = std::fmod(a - mina, maxa - mina);
-    if(val < 0.0) val += maxa-mina;
-    return val + mina;
-}
-inline float  wrap(float  a, float  mina, float  maxa) {
-    float val = std::fmod(a - mina, maxa - mina);
-    if(val < 0.0) val += maxa-mina;
-    return val + mina;
+template<typename T>
+constexpr T wrap(T val, T mina, T maxa) {
+    T range = maxa - mina;
+    T result = std::fmod(val - mina, range);
+    if (result < T{}) result += range;
+    return result + mina;
 }
 
-inline double deg2rad(double deg) {
+constexpr double deg2rad(double deg) {
     return (M_PI/180.0) * deg;
 }
-inline double rad2deg(double rad) {
+constexpr double rad2deg(double rad) {
     return (180.0/M_PI) * rad;
 }
 
@@ -142,22 +134,22 @@ private:
 // ***********
 // * Random
 
-// need functions that allow for the random source
-// to be made more deterministic for replays...
+#include <random>
 
 inline void initRand() {
-    // currently none!  Should seed using clock
-    srand(uint(time(0)));
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
 }
 
 inline double drand(double min, double max) {
-    const double invMAX = 1.0/double(RAND_MAX);
-    double rand0to1 = double(std::rand())*invMAX;
-    return (max-min)*rand0to1 + min;
+    static std::default_random_engine gen{std::random_device{}()};
+    std::uniform_real_distribution<double> dist{min, max};
+    return dist(gen);
 }
 
 inline uint randMod(uint range) {
-    return std::rand()%range;
+    static std::default_random_engine gen{std::random_device{}()};
+    std::uniform_int_distribution<uint> dist{0, range - 1};
+    return dist(gen);
 }
 
 

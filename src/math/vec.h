@@ -28,6 +28,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <array>
+#include <utility>
 
 #include "prelude.h"
 
@@ -50,23 +52,21 @@ public: // names
     };
 // +---------------------------------
 public: // constructors
-    inline Vec2() {}
-    inline Vec2(const N &n0, const N &n1) : x(n0), y(n1) {}
-    // allows implicit conversion based on generics...
+    Vec2() = default;
+    Vec2(const N &n0, const N &n1) : x(n0), y(n1) {}
     template<class T>
-    inline Vec2(const Vec2<T> &cp) : x(cp.x), y(cp.y) {}
-    // build from short array in memory
-    inline Vec2(const N *ns) : x(ns[0]), y(ns[1]) {}
+    Vec2(const Vec2<T> &cp) : x(cp.x), y(cp.y) {}
+    Vec2(const N *ns) : x(ns[0]), y(ns[1]) {}
 // +---------------------------------
 public: // indexing
-    inline N& operator[](uint i)       { return v[i]; }
-    inline N  operator[](uint i) const { return v[i]; }
+    N& operator[](uint i)       { return v[i]; }
+    N  operator[](uint i) const { return v[i]; }
 // +---------------------------------
 public: // destructive arithmetic
-    inline Vec2<N>& operator+=(const Vec2<N> &rhs);
-    inline Vec2<N>& operator-=(const Vec2<N> &rhs);
-    inline Vec2<N>& operator*=(const N &rhs);
-    inline Vec2<N>& operator/=(const N &rhs);
+    Vec2<N>& operator+=(const Vec2<N> &rhs);
+    Vec2<N>& operator-=(const Vec2<N> &rhs);
+    Vec2<N>& operator*=(const N &rhs);
+    Vec2<N>& operator/=(const N &rhs);
 };
 // +---------------------------------
 // comparison operators
@@ -155,23 +155,21 @@ public: // names
     };
 // +---------------------------------
 public: // constructors
-    inline Vec3() {}
-    inline Vec3(const N &n0, const N &n1, const N &n2) : x(n0), y(n1), z(n2) {}
-    // allows implicit conversion based on generics...
+    Vec3() = default;
+    Vec3(const N &n0, const N &n1, const N &n2) : x(n0), y(n1), z(n2) {}
     template<class T>
-    inline Vec3(const Vec3<T> &cp) : x(cp.x), y(cp.y), z(cp.z) {}
-    // build from short array in memory
-    inline Vec3(const N *ns) : x(ns[0]), y(ns[1]), z(ns[2]) {}
+    Vec3(const Vec3<T> &cp) : x(cp.x), y(cp.y), z(cp.z) {}
+    Vec3(const N *ns) : x(ns[0]), y(ns[1]), z(ns[2]) {}
 // +---------------------------------
 public: // indexing
-    inline N& operator[](uint i)       { return v[i]; }
-    inline N  operator[](uint i) const { return v[i]; }
+    N& operator[](uint i)       { return v[i]; }
+    N  operator[](uint i) const { return v[i]; }
 // +---------------------------------
 public: // destructive arithmetic
-    inline Vec3<N>& operator+=(const Vec3<N> &rhs);
-    inline Vec3<N>& operator-=(const Vec3<N> &rhs);
-    inline Vec3<N>& operator*=(const N &rhs);
-    inline Vec3<N>& operator/=(const N &rhs);
+    Vec3<N>& operator+=(const Vec3<N> &rhs);
+    Vec3<N>& operator-=(const Vec3<N> &rhs);
+    Vec3<N>& operator*=(const N &rhs);
+    Vec3<N>& operator/=(const N &rhs);
 };
 // +---------------------------------
 // comparison operators
@@ -264,24 +262,22 @@ public: // names
     };
 // +---------------------------------
 public: // constructors
-    inline Vec4() {}
-    inline Vec4(const N &n0, const N &n1, const N &n2, const N &n3) :
+    Vec4() = default;
+    Vec4(const N &n0, const N &n1, const N &n2, const N &n3) :
         x(n0), y(n1), z(n2), w(n3) {}
-    // allows implicit conversion based on generics...
     template<class T>
-    inline Vec4(const Vec4<T> &cp) : x(cp.x), y(cp.y), z(cp.z), w(cp.w) {}
-    // build from short array in memory
-    inline Vec4(const N *ns) : x(ns[0]), y(ns[1]), z(ns[2]), w(ns[3]) {}
+    Vec4(const Vec4<T> &cp) : x(cp.x), y(cp.y), z(cp.z), w(cp.w) {}
+    Vec4(const N *ns) : x(ns[0]), y(ns[1]), z(ns[2]), w(ns[3]) {}
 // +---------------------------------
 public: // indexing
-    inline N& operator[](uint i)       { return v[i]; }
-    inline N  operator[](uint i) const { return v[i]; }
+    N& operator[](uint i)       { return v[i]; }
+    N  operator[](uint i) const { return v[i]; }
 // +---------------------------------
 public: // destructive arithmetic
-    inline Vec4<N>& operator+=(const Vec4<N> &rhs);
-    inline Vec4<N>& operator-=(const Vec4<N> &rhs);
-    inline Vec4<N>& operator*=(const N &rhs);
-    inline Vec4<N>& operator/=(const N &rhs);
+    Vec4<N>& operator+=(const Vec4<N> &rhs);
+    Vec4<N>& operator-=(const Vec4<N> &rhs);
+    Vec4<N>& operator*=(const N &rhs);
+    Vec4<N>& operator/=(const N &rhs);
 };
 // +---------------------------------
 // comparison operators
@@ -354,15 +350,15 @@ inline std::ostream& operator<<(std::ostream &out, const Vec4<N> &vec) {
 // **************************************************************************
 // *  Aliases for Common Specializations
 // **************************************************************************
-typedef Vec2<int> Vec2i;
+using Vec2i = Vec2<int>;
 
-typedef Vec2<float> Vec2f;
-typedef Vec3<float> Vec3f;
-typedef Vec4<float> Vec4f;
+using Vec2f = Vec2<float>;
+using Vec3f = Vec3<float>;
+using Vec4f = Vec4<float>;
 
-typedef Vec2<double> Vec2d;
-typedef Vec3<double> Vec3d;
-typedef Vec4<double> Vec4d;
+using Vec2d = Vec2<double>;
+using Vec3d = Vec3<double>;
+using Vec4d = Vec4<double>;
 
 // **************************************************************************
 // *  Conversions Between Dimensions
@@ -377,16 +373,6 @@ template<class N>
 inline Vec4<N> toHom(const Vec3<N> &v3) {
     return Vec4<N>(v3.x, v3.y, v3.z, 1);
 }
-/*
-// Homogeneous -> Cartesian (BEWARE when last coordinate == 0)
-template<class N>
-inline Vec2<N> cartProj(const Vec3<N> &v3) {
-    return Vec2<N>(v3.x, v3.y) / v3.z;
-}
-template<class N>
-inline Vec3<N> cartProj(const Vec4<N> &v4) {
-    return Vec3<N>(v4.x, v4.y, v4.z) / v4.w;
-}*/
 
 
 // **************************************************************************
@@ -467,11 +453,11 @@ inline Vec2<N> operator-(const Vec2<N> &vec) {
 }
 template<>
 inline Vec2<double> abs(const Vec2<double> &vec) {
-    return Vec2<double>(fabs(vec.x), fabs(vec.y));
+    return Vec2<double>(std::fabs(vec.x), std::fabs(vec.y));
 }
 template<>
 inline Vec2<float> abs(const Vec2<float> &vec) {
-    return Vec2<float>(fabs(vec.x), fabs(vec.y));
+    return Vec2<float>(std::fabs(vec.x), std::fabs(vec.y));
 }
 // +---------------------------------
 // component-wise max/min
@@ -615,11 +601,11 @@ inline Vec3<N> operator-(const Vec3<N> &vec) {
 }
 template<>
 inline Vec3<double> abs(const Vec3<double> &vec) {
-    return Vec3<double>(fabs(vec.x), fabs(vec.y), fabs(vec.z));
+    return Vec3<double>(std::fabs(vec.x), std::fabs(vec.y), std::fabs(vec.z));
 }
 template<>
 inline Vec3<float> abs(const Vec3<float> &vec) {
-    return Vec3<float>(fabs(vec.x), fabs(vec.y), fabs(vec.z));
+    return Vec3<float>(std::fabs(vec.x), std::fabs(vec.y), std::fabs(vec.z));
 }
 // +---------------------------------
 // component-wise max/min
@@ -781,11 +767,11 @@ inline Vec4<N> operator-(const Vec4<N> &vec) {
 }
 template<>
 inline Vec4<double> abs(const Vec4<double> &vec) {
-    return Vec4<double>(fabs(vec.x), fabs(vec.y), fabs(vec.z), fabs(vec.w));
+    return Vec4<double>(std::fabs(vec.x), std::fabs(vec.y), std::fabs(vec.z), std::fabs(vec.w));
 }
 template<>
 inline Vec4<float> abs(const Vec4<float> &vec) {
-    return Vec4<float>(fabs(vec.x), fabs(vec.y), fabs(vec.z), fabs(vec.w));
+    return Vec4<float>(std::fabs(vec.x), std::fabs(vec.y), std::fabs(vec.z), std::fabs(vec.w));
 }
 // +---------------------------------
 // component-wise max/min
@@ -808,18 +794,18 @@ inline Vec4<N> min(const Vec4<N> &lhs, const Vec4<N> &rhs) {
 template<class N>
 inline uint maxDim(const Vec4<N> &vec) {
     return (vec.x >= vec.y)?
-                ((vec.x >= vec.z)? ((vec.x >= vec.w)? 0 : 3) :
-                                   ((vec.z >= vec.w)? 2 : 3)) :
-                ((vec.y >= vec.z)? ((vec.y >= vec.w)? 1 : 3) :
-                                   ((vec.z >= vec.w)? 2 : 3));
+                 ((vec.x >= vec.z)? ((vec.x >= vec.w)? 0 : 3) :
+                                    ((vec.z >= vec.w)? 2 : 3)) :
+                 ((vec.y >= vec.z)? ((vec.y >= vec.w)? 1 : 3) :
+                                    ((vec.z >= vec.w)? 2 : 3));
 }
 template<class N>
 inline uint minDim(const Vec4<N> &vec) {
     return (vec.x <= vec.y)?
-                ((vec.x <= vec.z)? ((vec.x <= vec.w)? 0 : 3) :
-                                   ((vec.z <= vec.w)? 2 : 3)) :
-                ((vec.y <= vec.z)? ((vec.y <= vec.w)? 1 : 3) :
-                                   ((vec.z <= vec.w)? 2 : 3));
+                 ((vec.x <= vec.z)? ((vec.x <= vec.w)? 0 : 3) :
+                                    ((vec.z <= vec.w)? 2 : 3)) :
+                 ((vec.y <= vec.z)? ((vec.y <= vec.w)? 1 : 3) :
+                                    ((vec.z <= vec.w)? 2 : 3));
 }
 template<class N>
 inline Vec3<N> proj(uint dim, const Vec4<N> &vec) {
@@ -876,4 +862,3 @@ template<class N>
 inline Vec4<N> normalized(const Vec4<N> &vec) {
     return vec / len(vec);
 }
-
