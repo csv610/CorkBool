@@ -67,8 +67,18 @@ add_test(NAME cork_test COMMAND cork_test)
 add_executable(cork_bench bench/benchmark.cpp)
 target_link_libraries(cork_bench PRIVATE cork_core)
 
+# Killer Apps (Proof of Concepts)
+add_executable(surgical_planner apps/surgical_planner.cpp)
+target_link_libraries(surgical_planner PRIVATE cork_core)
+
+add_executable(infill_generator apps/infill_generator.cpp)
+target_link_libraries(infill_generator PRIVATE cork_core)
+
+add_executable(kitbash_merger apps/kitbash_merger.cpp)
+target_link_libraries(kitbash_merger PRIVATE cork_core)
+
 # Installation
-install(TARGETS cork_core cork_cli
+install(TARGETS cork_core cork_cli surgical_planner infill_generator kitbash_merger
     EXPORT CorkTargets
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
