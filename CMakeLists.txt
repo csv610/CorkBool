@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(cork VERSION 1.0.0 LANGUAGES C CXX)
 
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -11,23 +9,22 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GMP REQUIRED gmp gmpxx)
 
-add_library(cork INTERFACE)
-target_include_directories(cork INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/util
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/math
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/isct
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/mesh
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/rawmesh
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/accel
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/file_formats
+# Interface library for headers and dependencies
+add_library(cork_interface INTERFACE)
+target_include_directories(cork_interface INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/util>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/math>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/isct>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/mesh>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/rawmesh>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/accel>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/file_formats>
     ${GMP_INCLUDE_DIRS}
 )
-target_link_libraries(cork INTERFACE ${GMP_LIBRARIES})
-target_compile_options(cork INTERFACE
-    $<$<CXX_COMPILER_ID:Clang>:-stdlib=libc++>
-)
+target_link_libraries(cork_interface INTERFACE ${GMP_LIBRARIES})
 
+# Core library
 add_library(cork_core STATIC
     src/cork.cpp
     src/util/timer.cpp
@@ -39,27 +36,42 @@ add_library(cork_core STATIC
     src/file_formats/off.cpp
     src/isct/triangle.c
 )
-target_include_directories(cork_core PRIVATE ${GMP_INCLUDE_DIRS})
-target_link_libraries(cork_core PUBLIC cork)
+target_link_libraries(cork_core PUBLIC cork_interface)
+
+# Compiler specific options
+if(MSVC)
+    target_compile_options(cork_core PRIVATE /W4)
+else()
+    target_compile_options(cork_core PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
 set_source_files_properties(src/isct/triangle.c PROPERTIES
-    COMPILE_OPTIONS "-O2;-DNO_TIMER;-DREDUCED;-DCDT_ONLY;-DTRILIBRARY;-Wall;-DANSI_DECLARATORS"
+    COMPILE_OPTIONS "-O2;-DNO_TIMER;-DREDUCED;-DCDT_ONLY;-DTRILIBRARY;-w;-DANSI_DECLARATORS"
 )
 
+# CLI
 add_executable(cork_cli src/main.cpp)
 target_link_libraries(cork_cli PRIVATE cork_core)
 
+# Tools
 add_executable(off2obj src/off2obj.cpp)
 target_link_libraries(off2obj PRIVATE cork_core)
 
+# Tests
 enable_testing()
-
 add_executable(cork_test tests/cork_test.cpp)
 target_link_libraries(cork_test PRIVATE cork_core)
-
 add_test(NAME cork_test COMMAND cork_test)
 
-install(TARGETS cork_core off2obj
+# Benchmarks
+add_executable(cork_bench bench/benchmark.cpp)
+target_link_libraries(cork_bench PRIVATE cork_core)
+
+# Installation
+install(TARGETS cork_core cork_cli
+    EXPORT CorkTargets
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
 )
+install(DIRECTORY src/ DESTINATION include/cork FILES_MATCHING PATTERN "*.h")

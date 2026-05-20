@@ -3,84 +3,75 @@
 // | 
 // | Author: Gilbert Bernstein
 // +-------------------------------------------------------------------------
-// | COPYRIGHT:
-// |    Copyright Gilbert Bernstein 2013
-// |    See the included COPYRIGHT file for further details.
-// |    
-// |    This file is part of the Cork library.
-//
-// |    Cork is free software: you can redistribute it and/or modify
-// |    it under the terms of the GNU Lesser General Public License as
-// |    published by the Free Software Foundation, either version 3 of
-// |    the License, or (at your option) any later version.
-//
-// |    Cork is distributed in the hope that it will be useful,
-// |    but WITHOUT ANY WARRANTY; without even the implied warranty of
-// |    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// |    GNU Lesser General Public License for more details.
-//
-// |    You should have received a copy 
-// |    of the GNU Lesser General Public License
-// |    along with Cork.  If not, see <http://www.gnu.org/licenses/>.
-// +-------------------------------------------------------------------------
 #pragma once
 
-#include <memory>
+#include <vector>
+#include <cstdint>
+#include <string>
+#include <system_error>
 
-#ifndef uint
-using uint = unsigned int;
-#endif
+namespace cork {
 
+using uint = std::uint32_t;
+
+/**
+ * @brief A simple triangle mesh structure.
+ * 
+ * Uses RAII via std::vector for automatic memory management.
+ */
 struct CorkTriMesh
 {
-    uint    n_triangles;
-    uint    n_vertices;
-    uint    *triangles;
-    float   *vertices;
+    std::vector<uint> triangles; // 3 indices per triangle
+    std::vector<float> vertices; // 3 coordinates per vertex
 };
 
-struct CorkTriMeshOwner {
-    std::unique_ptr<uint[]> triangles;
-    std::unique_ptr<float[]> vertices;
-    uint n_triangles = 0;
-    uint n_vertices = 0;
-
-    CorkTriMeshOwner() = default;
-    explicit CorkTriMeshOwner(uint n_verts, uint n_tris);
-    CorkTriMesh get();
-    void load(const CorkTriMesh& mesh);
-    void reset();
+/**
+ * @brief Error codes for Cork operations.
+ */
+enum class Error {
+    Success = 0,
+    EmptyMesh,
+    InvalidVertexReference,
+    SelfIntersecting,
+    NotClosed,
+    FileLoadFailure,
+    FileSaveFailure
 };
 
-void freeCorkTriMesh(CorkTriMesh *mesh);
+/**
+ * @brief Custom exception for Cork-specific errors.
+ */
+class CorkException : public std::runtime_error {
+public:
+    explicit CorkException(Error err, const std::string& msg) 
+        : std::runtime_error(msg), error_code(err) {}
+    Error code() const { return error_code; }
+private:
+    Error error_code;
+};
 
-// the inputs to Boolean operations must be "solid":
-//  -   closed (aka. watertight; see comment at bottom)
-//  -   non-self-intersecting
-// additionally, inputs should use a counter-clockwise convention
-// for triangle facing.  If the triangles are presented in clockwise
-// orientation, the object is interpreted as its unbounded complement
+/**
+ * @brief Test whether a mesh is solid (closed and non-self-intersecting).
+ * 
+ * @param mesh The mesh to test.
+ * @return true If solid.
+ * @return false If not solid.
+ */
+bool isSolid(const CorkTriMesh& mesh);
 
-// This function will test whether or not a mesh is solid
-bool isSolid(CorkTriMesh mesh);
+/**
+ * @brief Computes Boolean operations on triangle meshes.
+ * 
+ * Inputs must be solid and counter-clockwise oriented.
+ */
+CorkTriMesh computeUnion(const CorkTriMesh& a, const CorkTriMesh& b);
+CorkTriMesh computeDifference(const CorkTriMesh& a, const CorkTriMesh& b);
+CorkTriMesh computeIntersection(const CorkTriMesh& a, const CorkTriMesh& b);
+CorkTriMesh computeSymmetricDifference(const CorkTriMesh& a, const CorkTriMesh& b);
 
-// Boolean operations follow
-// result = A U B
-void computeUnion(CorkTriMesh in0, CorkTriMesh in1, CorkTriMesh *out);
+/**
+ * @brief Resolve intersections between two surfaces.
+ */
+CorkTriMesh resolveIntersections(const CorkTriMesh& a, const CorkTriMesh& b);
 
-// result = A - B
-void computeDifference(CorkTriMesh in0, CorkTriMesh in1, CorkTriMesh *out);
-
-// result = A ^ B
-void computeIntersection(CorkTriMesh in0, CorkTriMesh in1, CorkTriMesh *out);
-
-// result = A XOR B
-void computeSymmetricDifference(
-                        CorkTriMesh in0, CorkTriMesh in1, CorkTriMesh *out);
-
-// Not a Boolean operation, but related:
-//  No portion of either surface is deleted.  However, the
-//  curve of intersection between the two surfaces is made explicit,
-//  such that the two surfaces are now connected.
-void resolveIntersections(CorkTriMesh in0, CorkTriMesh in1, CorkTriMesh *out);
-
+} // namespace cork

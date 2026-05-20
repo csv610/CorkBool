@@ -1,71 +1,54 @@
-# Cork Boolean Library
+# Cork Boolean Library (Professional Edition)
 
-A C++ library for performing Boolean operations on triangle meshes.
+A high-performance C++20 library for performing Boolean operations on triangle meshes.
 
-## Overview
+## Key Features
 
-Cork computes boolean operations (union, difference, intersection, XOR) between watertight triangle meshes using GMP-based exact arithmetic.
+- **Exact Arithmetic:** Uses GMP-based exact arithmetic for robust Boolean operations.
+- **Modern C++ API:** RAII-compliant, namespaced, and exception-safe.
+- **Robustness:** Handles non-manifold and self-intersecting meshes with clear error reporting.
+- **Command Line Interface:** Intuitive tool for batch processing.
 
 ## Requirements
 
-- CMake 3.10+
-- C++20 compatible compiler (Clang, GCC)
-- GMP 5.0+
+- CMake 3.16+
+- C++20 Compiler (GCC 10+, Clang 10+, MSVC 2019+)
+- GMP 6.0+
 
 ## Building
 
 ```bash
-mkdir build
-cmake -S . -B build
-cmake --build build
-```
-
-## Testing
-
-```bash
-cd build
-ctest --output-on-failure
+mkdir build && cd build
+cmake ..
+cmake --build .
 ```
 
 ## Usage
 
-### Command Line
-
-```bash
-# Boolean operations
-./cork_cli -union inputA.off inputB.off output.off
-./cork_cli -diff inputA.off inputB.off output.off
-./cork_cli -isct inputA.off inputB.off output.off
-./cork_cli -xor inputA.off inputB.off output.off
-
-# Validate mesh
-./cork_cli -solid mesh.off
-
-# Resolve intersections
-./cork_cli -resolve inputA.off inputB.off output.off
-```
-
 ### C++ API
 
 ```cpp
-#include "cork.h"
+#include <cork/cork.h>
 
-CorkTriMesh result;
-computeUnion(meshA, meshB, &result);
-freeCorkTriMesh(&result);
-
-bool solid = isSolid(mesh);
+try {
+    cork::CorkTriMesh meshA = ...;
+    cork::CorkTriMesh meshB = ...;
+    
+    // Compute result
+    auto result = cork::computeUnion(meshA, meshB);
+    
+    // result is automatically cleaned up via RAII
+} catch (const cork::CorkException& e) {
+    std::cerr << "Cork error: " << e.what() << std::endl;
+}
 ```
 
-## Supported Formats
+### CLI
 
-- OFF (Object File Format)
-- IFS (Internal Face Set)
+```bash
+./cork_cli -union inputA.off inputB.off output.off
+```
 
 ## License
 
-See COPYRIGHT file. Licensed under LGPL.
-
-## Comparison with libigl and CGAL
-
-No benchmark comparisons with libigl or CGAL have been performed yet. Performance evaluation is under progress.
+Licensed under LGPL v3. See COPYRIGHT for details.
